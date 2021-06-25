@@ -15,22 +15,22 @@ contract Election {
   }
 
   modifier only_election_authority() {
-    if (msg.sender != electionAuthority) revert();
+    require(msg.sender == electionAuthority, "not election authority");
     _;
   }
   
   modifier vote_only_once() {
-    if (hasVoted[msg.sender]) revert();
+    require(hasVoted[msg.sender] != true, "vote twice");
     _;
   }
 
   modifier election_started() {
-    if (isElectionStarted != true) revert();
+    require(isElectionStarted == true, "election not started");
     _;
   }
 
   modifier election_not_ended() {
-    if (isElectionEnded == true) revert();
+    require(isElectionEnded != true, "election ended");
     _;
   }
   
@@ -53,9 +53,9 @@ contract Election {
   }
   
   function vote(string memory id) public
-    vote_only_once
     election_started
     election_not_ended
+    vote_only_once
   {
     votes[id] += 1;
     hasVoted[msg.sender] = true;
